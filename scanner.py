@@ -36,12 +36,10 @@ def scan_market(limit=None):
 
         try:
 
-            # 月K：下載10年月K資料
+            # 使用全部歷史月K資料
             df = download_stock_history(
                 code,
                 market,
-                period="10y",
-                interval="1mo",
             )
 
             # 計算 MACD
@@ -52,15 +50,23 @@ def scan_market(limit=None):
 
             if result and result["pass"]:
 
+                last_month_close = float(df.iloc[-2]["Close"])
+
+                change_percent = (
+                    (result["close"] - last_month_close)
+                    / last_month_close
+                    * 100
+                )
+
                 results.append({
                     "code": code,
                     "name": name,
                     "market": market,
                     "industry": industry,
-                    "close": result["close"],
-                    "high": result["high"],
-                    "osc": result["osc"],
-                    "osc_prev": result["osc_prev"],
+                    "close": round(result["close"], 2),
+                    "high": round(result["high"], 2),
+                    "change_percent": round(change_percent, 2),
+                    "osc": round(result["osc"], 3),
                 })
 
                 print("    ✅ 符合")
@@ -72,6 +78,12 @@ def scan_market(limit=None):
         except Exception as e:
 
             print(f"    ⚠️ {e}")
+
+    # 依本月漲幅由大到小排序
+    results.sort(
+        key=lambda x: x["change_percent"],
+        reverse=True,
+    )
 
     elapsed = time.time() - start_time
 
@@ -85,5 +97,5 @@ def scan_market(limit=None):
 
     return {
         "scan_count": total,
-        "results": results
+        "results": results,
     }

@@ -3,8 +3,8 @@ import pandas as pd
 
 def check_strategy(df: pd.DataFrame):
 
-    # 至少需要 60 根月K（約5年），MACD較穩定
-    if len(df) < 60:
+    # 至少需要 35 根月K，避免 MACD 因歷史資料不足而不穩定
+    if len(df) < 35:
         return None
 
     this_month = df.iloc[-1]

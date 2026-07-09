@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 
 def save_result(results, scan_count):
@@ -8,7 +9,9 @@ def save_result(results, scan_count):
     os.makedirs("docs/data", exist_ok=True)
 
     output = {
-        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "update_time": datetime.now(
+            ZoneInfo("Asia/Taipei")
+        ).strftime("%Y-%m-%d %H:%M:%S"),
         "scan_count": scan_count,
         "count": len(results),
         "stocks": results
