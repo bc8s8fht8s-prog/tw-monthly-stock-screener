@@ -11,9 +11,10 @@ let filteredStocks = [];
 
 async function loadData() {
 
-    const response = await fetch("data/result.json");
+    const response = await fetch("docs/data/result.json");
 
     data = await response.json();
+
     allStocks = data.stocks;
     filteredStocks = [...allStocks];
 
@@ -36,73 +37,89 @@ function renderPage(page) {
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
 
-const stocks = filteredStocks.slice(start, end);
+    const stocks = filteredStocks.slice(start, end);
 
-// 搜尋沒有結果
-if (stocks.length === 0) {
+    // 沒有搜尋結果
+    if (stocks.length === 0) {
 
-    stockList.innerHTML = `
-        <div
-            style="
-                text-align: center;
-                color: #888888;
-                font-size: 18px;
-                margin: 40px 0;
-            "
-        >
-            🔍 找不到符合條件的股票
-        </div>
-    `;
+        stockList.innerHTML = `
+            <div class="no-result">
+                🔍 找不到符合條件的股票
+            </div>
+        `;
 
-    document.getElementById("pagination").innerHTML = "";
+        document.getElementById("pagination").innerHTML = "";
 
-    return;
+        return;
 
-}
+    }
 
-stocks.forEach(stock => {
+    stocks.forEach(stock => {
 
-    stockList.innerHTML += `
+        const close = Number(stock.close).toFixed(2);
 
-        <div
-            style="
-                border: 1px solid #dddddd;
-                border-radius: 10px;
-                padding: 15px;
-                margin: 10px 0;
-                background: #ffffff;
-            "
-        >
+        const high = Number(stock.high).toFixed(2);
 
-            <h3>${stock.code} ${stock.name}</h3>
+        const change =
+            stock.change_percent != null
+                ? Number(stock.change_percent).toFixed(2)
+                : "--";
 
-            <p>
-                本月收盤：${Number(stock.close).toFixed(2)}
-            </p>
+        const osc =
+            stock.osc != null
+                ? Number(stock.osc).toFixed(3)
+                : "--";
 
-            <p>
-                前月最高：${Number(stock.high).toFixed(2)}
-            </p>
+        // OSC 顏色
+        let oscClass = "osc-neutral";
 
-            <p>
-                OSC：
-                <span
-                    style="
-                        color: ${stock.osc >= 0 ? "#d32f2f" : "#2e7d32"};
-                        font-weight: bold;
-                    "
-                >
-                    ${Number(stock.osc).toFixed(3)}
-                </span>
-            </p>
+        if (stock.osc > 0) {
 
-        </div>
+            oscClass = "osc-up";
 
-    `;
+        } else if (stock.osc < 0) {
 
-});
+            oscClass = "osc-down";
 
-renderPagination();
+        }
+
+        stockList.innerHTML += `
+
+            <div class="stock-card">
+
+                <h3>${stock.code} ${stock.name}</h3>
+
+                <p>
+                    本月收盤：
+                    <strong>${close}</strong>
+                </p>
+
+                <p>
+                    上月最高：
+                    <strong>${high}</strong>
+                </p>
+
+                <p>
+                    本月漲幅：
+                    <span class="osc-up">
+                        ${change}%
+                    </span>
+                </p>
+
+                <p>
+                    OSC：
+                    <span class="${oscClass}">
+                        ${osc}
+                    </span>
+                </p>
+
+            </div>
+
+        `;
+
+    });
+
+    renderPagination();
 
 }
 
@@ -116,60 +133,31 @@ function renderPagination() {
     if (currentPage > 1) {
 
         html += `
-            <button
-                onclick="renderPage(${currentPage - 1})"
-                style="
-                    width: 42px;
-                    height: 42px;
-                    border-radius: 10px;
-                    border: 1px solid #d0d0d0;
-                    background: white;
-                    font-size: 18px;
-                    cursor: pointer;
-                "
-            >
+            <button class="page-btn"
+                onclick="renderPage(${currentPage - 1})">
                 ◀
             </button>
         `;
 
     }
 
-    // 要顯示的頁碼範圍
     let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, currentPage + 2);
 
-    // 如果靠近開頭
     if (currentPage <= 3) {
-
         endPage = Math.min(5, totalPages);
-
     }
 
-    // 如果靠近結尾
     if (currentPage >= totalPages - 2) {
-
         startPage = Math.max(1, totalPages - 4);
-
     }
 
-    // 頁碼按鈕
     for (let i = startPage; i <= endPage; i++) {
 
         if (i === currentPage) {
 
             html += `
-                <button
-                    style="
-                        width: 42px;
-                        height: 42px;
-                        border-radius: 10px;
-                        border: none;
-                        background: #2563eb;
-                        color: white;
-                        font-size: 18px;
-                        font-weight: bold;
-                    "
-                >
+                <button class="page-btn active">
                     ${i}
                 </button>
             `;
@@ -178,17 +166,8 @@ function renderPagination() {
 
             html += `
                 <button
-                    onclick="renderPage(${i})"
-                    style="
-                        width: 42px;
-                        height: 42px;
-                        border-radius: 10px;
-                        border: 1px solid #d0d0d0;
-                        background: white;
-                        font-size: 18px;
-                        cursor: pointer;
-                    "
-                >
+                    class="page-btn"
+                    onclick="renderPage(${i})">
                     ${i}
                 </button>
             `;
@@ -201,18 +180,8 @@ function renderPagination() {
     if (currentPage < totalPages) {
 
         html += `
-            <button
-                onclick="renderPage(${currentPage + 1})"
-                style="
-                    width: 42px;
-                    height: 42px;
-                    border-radius: 10px;
-                    border: 1px solid #d0d0d0;
-                    background: white;
-                    font-size: 18px;
-                    cursor: pointer;
-                "
-            >
+            <button class="page-btn"
+                onclick="renderPage(${currentPage + 1})">
                 ▶
             </button>
         `;
@@ -220,16 +189,7 @@ function renderPagination() {
     }
 
     document.getElementById("pagination").innerHTML = `
-        <div
-            style="
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                gap: 10px;
-                margin: 25px 0;
-                flex-wrap: wrap;
-            "
-        >
+        <div class="pagination">
             ${html}
         </div>
     `;
