@@ -79,10 +79,9 @@ def scan_market(limit=None):
 
             print(f"    ⚠️ {e}")
 
-    # 依本月漲幅由大到小排序
+    # 依股號由小到大排序
     results.sort(
-        key=lambda x: x["change_percent"],
-        reverse=True,
+        key=lambda x: int(x["code"]),
     )
 
     elapsed = time.time() - start_time
