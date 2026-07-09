@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>台股月K選股</title>
+
+    <link rel="stylesheet" href="static/style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>📈 台股月K選股</h1>
+
+        <div class="info">
+
+            <div class="info-row">
+                <span>🕒 更新時間</span>
+                <span id="update_time">讀取中...</span>
+            </div>
+
+            <div class="info-row">
+                <span>📊 掃描股票</span>
+                <span id="scan_count">-</span>
+            </div>
+
+            <div class="info-row">
+                <span>🎯 符合條件</span>
+                <span id="count">-</span>
+            </div>
+
+        </div>
+
+        <!-- 搜尋框 -->
+        <div
+            style="
+                margin: 20px 0;
+                text-align: center;
+            "
+        >
+
+            <input
+                id="search"
+                type="text"
+                placeholder="🔍 輸入股號或股名..."
+                oninput="searchStocks()"
+                style="
+                    width: 90%;
+                    max-width: 420px;
+                    padding: 12px 16px;
+                    font-size: 16px;
+                    border: 1px solid #cccccc;
+                    border-radius: 10px;
+                    outline: none;
+                    box-sizing: border-box;
+                "
+            >
+
+        </div>
+
+        <div id="stock-list"></div>
+
+        <div id="pagination"></div>
+
+    </div>
+
+    <script src="script.js?v=1.4.0"></script>
+
+</body>
+
+</html>
